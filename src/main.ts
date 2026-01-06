@@ -14,7 +14,12 @@ async function bootstrap() {
     origin: true, // Permite cualquier origen y refleja el origen de la petición
     credentials: true, // Permite envío de cookies y credenciales
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'ngrok-skip-browser-warning',
+    ],
     exposedHeaders: ['Authorization'],
   });
 
