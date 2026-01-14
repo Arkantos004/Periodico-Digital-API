@@ -131,4 +131,12 @@ export class ArticulosService {
       1,
     );
   }
+
+  async findUnpublished() {
+    return this.articuloRepository.find({
+      where: { publicado: false },
+      relations: ['autores', 'autores.rol'],
+      order: { createdAt: 'DESC' },
+    });
+  }
 }

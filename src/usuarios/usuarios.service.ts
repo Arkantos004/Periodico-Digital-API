@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
+import { Articulo } from '../entities/articulo.entity';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
 @Injectable()
@@ -9,6 +10,8 @@ export class UsuariosService {
   constructor(
     @InjectRepository(Usuario)
     private usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Articulo)
+    private articuloRepository: Repository<Articulo>,
   ) {}
 
   async findAll() {
@@ -62,9 +65,13 @@ export class UsuariosService {
     return this.usuarioRepository.save(usuario);
   }
 
-  async remove(id: number) {
+  async remove(id: number, adminId: number) {
     const usuario = await this.findOne(id);
-    await this.usuarioRepository.remove(usuario);
-    return { message: 'Usuario eliminado exitosamente' };
+
+    // Desactivar el usuario en lugar de eliminarlo
+    usuario.activo = false;
+    await this.usuarioRepository.save(usuario);
+
+    return { message: 'Usuario desactivado exitosamente' };
   }
 }

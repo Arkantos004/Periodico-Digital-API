@@ -20,7 +20,9 @@ import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
+import { GetUser } from '../decorators/get-user.decorator';
 import { RolEnum } from '../entities/rol.entity';
+import { Usuario } from '../entities/usuario.entity';
 
 @ApiTags('Usuarios')
 @ApiBearerAuth('JWT-auth')
@@ -144,7 +146,10 @@ export class UsuariosController {
     },
   })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.usuariosService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() admin: Usuario,
+  ) {
+    return this.usuariosService.remove(id, admin.id);
   }
 }

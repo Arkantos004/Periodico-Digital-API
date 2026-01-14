@@ -111,6 +111,47 @@ export class ArticulosController {
     return this.articulosService.findAll();
   }
 
+  @Get('despublicados')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(RolEnum.ADMINISTRADOR, RolEnum.PERIODISTA)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Obtener todos los artículos despublicados (Admin/Periodista)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de artículos despublicados',
+    schema: {
+      example: [
+        {
+          id: 1,
+          titulo: 'Artículo sin publicar',
+          contenido: 'En este artículo...',
+          categoria: 'Tecnología',
+          imagenes: ['https://example.com/imagen1.jpg'],
+          publicado: false,
+          contadorVisualizaciones: 0,
+          autores: [
+            {
+              id: 1,
+              nombre: 'Juan',
+              apellido: 'Pérez',
+              email: 'juan@ejemplo.com',
+            },
+          ],
+          createdAt: '2025-12-25T10:30:00.000Z',
+          updatedAt: '2025-12-25T10:30:00.000Z',
+        },
+      ],
+    },
+  })
+  @ApiResponse({ status: 401, description: 'No autorizado' })
+  @ApiResponse({
+    status: 403,
+    description: 'Requiere rol ADMINISTRADOR o PERIODISTA',
+  })
+  findUnpublished() {
+    return this.articulosService.findUnpublished();
+  }
+
   @Get('buscar')
   @ApiOperation({
     summary: 'Buscar artículos por título, contenido o categoría',

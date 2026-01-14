@@ -11,8 +11,8 @@ async function bootstrap() {
 
   // Habilitar CORS con credenciales
   app.enableCors({
-    origin: true, // Permite cualquier origen y refleja el origen de la petición
-    credentials: true, // Permite envío de cookies y credenciales
+    origin: true,
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
