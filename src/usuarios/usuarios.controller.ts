@@ -134,13 +134,13 @@ export class UsuariosController {
 
   @Delete(':id')
   @Roles(RolEnum.ADMINISTRADOR)
-  @ApiOperation({ summary: 'Eliminar usuario (Solo admin)' })
+  @ApiOperation({ summary: 'Desactivar usuario (Solo admin)' })
   @ApiResponse({
     status: 200,
-    description: 'Usuario eliminado',
+    description: 'Usuario desactivado',
     schema: {
       example: {
-        message: 'Usuario eliminado exitosamente',
+        message: 'Usuario desactivado exitosamente',
         id: 1,
       },
     },
@@ -151,5 +151,23 @@ export class UsuariosController {
     @GetUser() admin: Usuario,
   ) {
     return this.usuariosService.remove(id, admin.id);
+  }
+
+  @Patch(':id/activate')
+  @Roles(RolEnum.ADMINISTRADOR)
+  @ApiOperation({ summary: 'Reactivar usuario desactivado (Solo admin)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Usuario reactivado',
+    schema: {
+      example: {
+        message: 'Usuario reactivado exitosamente',
+        id: 1,
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+  activate(@Param('id', ParseIntPipe) id: number) {
+    return this.usuariosService.activate(id);
   }
 }

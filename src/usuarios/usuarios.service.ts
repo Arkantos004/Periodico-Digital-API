@@ -74,4 +74,14 @@ export class UsuariosService {
 
     return { message: 'Usuario desactivado exitosamente' };
   }
+
+  async activate(id: number) {
+    const usuario = await this.findOne(id);
+
+    // Reactivar el usuario
+    usuario.activo = true;
+    await this.usuarioRepository.save(usuario);
+
+    return { message: 'Usuario reactivado exitosamente' };
+  }
 }
