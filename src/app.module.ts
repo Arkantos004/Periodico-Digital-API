@@ -7,8 +7,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ArticulosModule } from './articulos/articulos.module';
 import { ComentariosModule } from './comentarios/comentarios.module';
+import { LiveStreamModule } from './live-stream/live-stream.module';
 /* import { LogsModule } from './logs/logs.module'; */
-/* import { LoggerMiddleware } from './middleware/logger.middleware'; */
 
 // Entidades
 import { Usuario } from './entities/usuario.entity';
@@ -18,6 +18,7 @@ import { Articulo } from './entities/articulo.entity';
 import { Comentario } from './entities/comentario.entity';
 import { LogVisualizacionArticulo } from './entities/log-visualizacion-articulo.entity';
 import { LogVisualizacionSitio } from './entities/log-visualizacion-sitio.entity';
+import { LiveStream } from './entities/live-stream.entity';
 
 @Module({
   imports: [
@@ -42,15 +43,16 @@ import { LogVisualizacionSitio } from './entities/log-visualizacion-sitio.entity
           Comentario,
           LogVisualizacionArticulo,
           LogVisualizacionSitio,
+          LiveStream,
         ],
-        synchronize: false, // Desactivado - usar migraciones
+        synchronize: false,
         logging: false,
       }),
     }),
     AuthModule,
     UsuariosModule,
     ArticulosModule,
-    ComentariosModule,
+    LiveStreamModule,
     /* LogsModule, */
   ],
   controllers: [AppController],

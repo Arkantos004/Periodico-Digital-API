@@ -25,6 +25,15 @@ export class CreateArticuloDto {
   contenido: string;
 
   @ApiProperty({
+    description: 'Resumen breve del artículo',
+    example: 'Un resumen de una línea sobre el artículo...',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  resumen?: string;
+
+  @ApiProperty({
     description: 'Categoría del artículo',
     example: 'Tecnología',
   })

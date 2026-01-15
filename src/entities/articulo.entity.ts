@@ -21,6 +21,9 @@ export class Articulo {
   @Column({ type: 'text' })
   contenido: string;
 
+  @Column({ type: 'text', nullable: true })
+  resumen: string;
+
   @Column({ type: 'varchar', length: 255 })
   categoria: string;
 
