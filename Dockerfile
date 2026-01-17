@@ -1,41 +1,34 @@
-# ---------- Stage 1: build ----------
-FROM node:20-alpine AS build
+# ---------- Build ----------
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Enable pnpm via Corepack (mejor que instalar global)
+# Habilita pnpm vía Corepack
 RUN corepack enable
 
-# Dependencies (con cache)
+# Copia manifests primero para cachear mejor
 COPY package.json pnpm-lock.yaml ./
+
+# Instala deps (incluye dev para compilar)
 RUN pnpm install --frozen-lockfile
 
-# Source
+# Copia el resto y compila
 COPY . .
-
-# Build -> genera dist/
 RUN pnpm run build
 
-# ---------- Stage 2: production ----------
-FROM node:20-alpine AS prod
+# ---------- Runtime ----------
+FROM node:20-alpine AS runner
 WORKDIR /app
 
+ENV NODE_ENV=production
 RUN corepack enable
 
-ENV NODE_ENV=production
-ENV PORT=3001
-
-# Solo deps de producción
+# Instala solo deps de producción
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --prod --frozen-lockfile
 
-# Copiamos el build + config que usas
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/ormconfig.ts ./ormconfig.ts
-
-# (Opcional) si tienes assets estáticos, descomenta y ajusta
-# COPY --from=build /app/public ./public
+# Copia el build
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 3001
 
-# Arranque directo (evita líos de scripts/paths)
 CMD ["node", "dist/src/main.js"]
