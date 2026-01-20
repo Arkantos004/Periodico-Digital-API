@@ -26,7 +26,8 @@ export class LiveStreamController {
   @Get()
   @ApiOperation({ summary: 'Obtener transmisión activa' })
   async findActive() {
-    return this.liveStreamService.findActive();
+    const stream = await this.liveStreamService.findActive();
+    return stream || { id: null, activo: false, url: '', titulo: '', descripcion: '' };
   }
 
   @Get(':id')

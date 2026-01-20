@@ -29,36 +29,21 @@ export class UploadService {
     };
   }
 
-  uploadMultiple(
-    files: Express.Multer.File[],
-  ): { urls: string[]; filenames: string[] } {
-    if (!files || files.length === 0) {
-      throw new Error('No files provided');
-    }
-
-    const result: { urls: string[]; filenames: string[] } = {
-      urls: [],
-      filenames: [],
-    };
-
-    files.forEach((file) => {
-      const filename = `${Date.now()}-${Math.random()}-${file.originalname}`;
-      const filepath = path.join(this.uploadsDir, filename);
-
-      fs.writeFileSync(filepath, file.buffer);
-
-      result.filenames.push(filename);
-      result.urls.push(`/api/uploads/${filename}`);
-    });
-
-    return result;
-  }
-
   deleteFile(filename: string): void {
     const filepath = path.join(this.uploadsDir, filename);
 
     if (fs.existsSync(filepath)) {
       fs.unlinkSync(filepath);
     }
+  }
+
+  getFile(filename: string): Buffer {
+    const filepath = path.join(this.uploadsDir, filename);
+
+    if (!fs.existsSync(filepath)) {
+      throw new Error('Archivo no encontrado');
+    }
+
+    return fs.readFileSync(filepath);
   }
 }

@@ -1,13 +1,17 @@
 import {
   Controller,
   Post,
+  Get,
+  Param,
   UseInterceptors,
   UploadedFile,
-  UploadedFiles,
   UseGuards,
   BadRequestException,
+  Res,
+  NotFoundException,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Response } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -58,44 +62,19 @@ export class UploadController {
     return this.uploadService.uploadFile(file);
   }
 
-  @Post('images')
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      fileFilter: (req, file, cb) => {
-        if (!file.mimetype.startsWith('image/')) {
-          return cb(
-            new BadRequestException('Solo se permiten archivos de imagen'),
-            false,
-          );
-        }
-        cb(null, true);
-      },
-      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB por imagen
-    }),
-  )
-  @ApiBearerAuth('JWT-auth')
-  @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Subir múltiples imágenes' })
-  @ApiResponse({
-    status: 201,
-    description: 'Imágenes subidas exitosamente',
-    schema: {
-      example: {
-        urls: [
-          '/uploads/1705700000000-imagen1.jpg',
-          '/uploads/1705700001000-imagen2.jpg',
-        ],
-        filenames: [
-          '1705700000000-imagen1.jpg',
-          '1705700001000-imagen2.jpg',
-        ],
-      },
-    },
-  })
-  @ApiResponse({ status: 400, description: 'Archivos inválidos' })
-  @ApiResponse({ status: 401, description: 'No autorizado' })
-  uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
-    return this.uploadService.uploadMultiple(files);
+  @Get(':filename')
+  @ApiOperation({ summary: 'Obtener una imagen subida' })
+  @ApiResponse({ status: 200, description: 'Imagen encontrada' })
+  @ApiResponse({ status: 404, description: 'Imagen no encontrada' })
+  getImage(@Param('filename') filename: string, @Res() res: Response) {
+    try {
+      const file = this.uploadService.getFile(filename);
+      res.setHeader('Content-Type', 'image/jpeg');
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.send(file);
+    } catch (error) {
+      throw new NotFoundException('Imagen no encontrada');
+    }
   }
+
 }
