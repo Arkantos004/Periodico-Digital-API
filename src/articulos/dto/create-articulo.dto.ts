@@ -27,11 +27,11 @@ export class CreateArticuloDto {
   @ApiProperty({
     description: 'Resumen breve del artículo',
     example: 'Un resumen de una línea sobre el artículo...',
-    required: false,
+    required: true,
   })
   @IsString()
-  @IsOptional()
-  resumen?: string;
+  @IsNotEmpty({ message: 'El resumen es requerido' })
+  resumen: string;
 
   @ApiProperty({
     description: 'Categoría del artículo',

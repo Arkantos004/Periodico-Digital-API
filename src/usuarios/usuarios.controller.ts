@@ -17,6 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { UsuariosService } from './usuarios.service';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
+import { UpdateUsuarioRolDto } from './dto/update-usuario-rol.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
@@ -169,5 +170,37 @@ export class UsuariosController {
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   activate(@Param('id', ParseIntPipe) id: number) {
     return this.usuariosService.activate(id);
+  }
+
+  @Patch(':id/rol')
+  @Roles(RolEnum.ADMINISTRADOR)
+  @ApiOperation({ summary: 'Actualizar rol del usuario (Solo admin)' })
+  @ApiBody({ type: UpdateUsuarioRolDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Rol actualizado',
+    schema: {
+      example: {
+        id: 1,
+        email: 'juan@ejemplo.com',
+        nombre: 'Juan',
+        apellido: 'Pérez',
+        activo: true,
+        rol: {
+          id: 2,
+          nombre: 'PERIODISTA',
+        },
+        createdAt: '2025-12-20T10:00:00.000Z',
+        updatedAt: '2025-12-25T13:00:00.000Z',
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Rol inválido' })
+  @ApiResponse({ status: 404, description: 'Usuario o rol no encontrado' })
+  updateRol(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateRolDto: UpdateUsuarioRolDto,
+  ) {
+    return this.usuariosService.updateRol(id, updateRolDto.rol);
   }
 }

@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Usuario } from '../entities/usuario.entity';
 import { Articulo } from '../entities/articulo.entity';
+import { Rol, RolEnum } from '../entities/rol.entity';
 import { UpdateUsuarioDto } from './dto/update-usuario.dto';
 
 @Injectable()
@@ -12,6 +13,8 @@ export class UsuariosService {
     private usuarioRepository: Repository<Usuario>,
     @InjectRepository(Articulo)
     private articuloRepository: Repository<Articulo>,
+    @InjectRepository(Rol)
+    private rolRepository: Repository<Rol>,
   ) {}
 
   async findAll() {
@@ -83,5 +86,32 @@ export class UsuariosService {
     await this.usuarioRepository.save(usuario);
 
     return { message: 'Usuario reactivado exitosamente' };
+  }
+
+  async updateRol(id: number, rolNombre: string) {
+    const usuario = await this.findOne(id);
+
+    // Normalizar el nombre del rol a minúsculas (como está en RolEnum)
+    const rolNormalizado = rolNombre.toLowerCase();
+
+    // Validar que el rol existe
+    const rolesValidos = Object.values(RolEnum);
+    if (!rolesValidos.includes(rolNormalizado as RolEnum)) {
+      throw new BadRequestException(
+        `Rol inválido. Los roles válidos son: ${rolesValidos.join(', ')}`,
+      );
+    }
+
+    // Buscar el rol en la base de datos
+    const rol = await this.rolRepository.findOne({
+      where: { nombre: rolNormalizado as RolEnum },
+    });
+
+    if (!rol) {
+      throw new NotFoundException(`Rol ${rolNormalizado} no encontrado`);
+    }
+
+    usuario.rol = rol;
+    return this.usuarioRepository.save(usuario);
   }
 }
