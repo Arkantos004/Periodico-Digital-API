@@ -25,7 +25,7 @@ export class UploadService {
 
     return {
       filename,
-      url: `/uploads/${filename}`,
+      url: `/api/uploads/${filename}`,
     };
   }
 
@@ -36,7 +36,7 @@ export class UploadService {
       throw new Error('No files provided');
     }
 
-    const result = {
+    const result: { urls: string[]; filenames: string[] } = {
       urls: [],
       filenames: [],
     };
@@ -48,7 +48,7 @@ export class UploadService {
       fs.writeFileSync(filepath, file.buffer);
 
       result.filenames.push(filename);
-      result.urls.push(`/uploads/${filename}`);
+      result.urls.push(`/api/uploads/${filename}`);
     });
 
     return result;
